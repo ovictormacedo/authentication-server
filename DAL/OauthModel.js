@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var OauthSchema = new Schema({
     userId: String,
-    token: String,
+    accessToken: String,
     refreshToken: String,
     expirationToken: Number,
     expirationRefreshToken: Number
