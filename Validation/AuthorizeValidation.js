@@ -1,11 +1,15 @@
 const { check } = require('express-validator');
 var mongoose = require('mongoose');
 
-exports.AuthorizeValidation = [
+exports.authorizeValidation = [
     check("client_id").isLength({min:1}),
     check("client_secret").isLength({min:1}),
     check("grant_type").equals("password"),
     check("scope").isLength({min:1}),
     check("username").isLength({min:1}),
     check("password").isLength({min:1})
+];
+
+exports.refreshValidation = [
+    check("authorization").isLength({min:8})
 ];

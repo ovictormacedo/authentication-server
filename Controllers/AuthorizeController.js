@@ -7,7 +7,7 @@ const { validationResult } = require('express-validator'),
 
 var env = process.env;
 
-exports.AuthorizeController = function (req, res) {
+exports.authorizeController = function (req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.send("Wrong parameters!");
@@ -44,8 +44,8 @@ exports.AuthorizeController = function (req, res) {
                 //If not found, insert a new one
                 if (oauth == "") {
                     let d = new Date();
-                    let expirationToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.TOKEN_TIME).getTime();
-                    let expirationRefreshToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.REFRESH_TOKEN_TIME).getTime();
+                    let expirationToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()+env.TOKEN_TIME).getTime();
+                    let expirationRefreshToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()+env.REFRESH_TOKEN_TIME).getTime();
                     let personAux = {person, "exp":expirationToken};
                     let accessToken = jwt.sign(JSON.stringify(personAux), 'secret');
                     personAux = {person, "exp":expirationRefreshToken};
@@ -73,7 +73,7 @@ exports.AuthorizeController = function (req, res) {
                     });
                 } else {
                     let d = new Date();
-                    let now = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()).getTime();
+                    let now = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()).getTime();
                     let oauthCurrent = oauth[0];
                     //The access token is still valid
                     if (now < oauthCurrent.expirationToken) {
@@ -94,8 +94,8 @@ exports.AuthorizeController = function (req, res) {
                         });                         
                     } else {
                         let d = new Date();
-                        let expirationToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.TOKEN_TIME).getTime();
-                        let expirationRefreshToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.REFRESH_TOKEN_TIME).getTime();
+                        let expirationToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()+env.TOKEN_TIME).getTime();
+                        let expirationRefreshToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()+env.REFRESH_TOKEN_TIME).getTime();
                         let personAux = {person, "exp":expirationToken};
                         let accessToken = jwt.sign(JSON.stringify(personAux), 'secret');
                         personAux = {person, "exp":expirationRefreshToken};
@@ -124,6 +124,75 @@ exports.AuthorizeController = function (req, res) {
                     }
                 }
             });
+        });
+    }
+}
+
+exports.refreshController = function (req, res) {
+    console.log();
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.send("Wrong parameters!");
+    } else {
+        let authorization = req.headers.authorization;
+        let refreshToken = authorization.substring(7, authorization.length);
+
+        //Search for a valid token for the user
+        var oauthPromisse = oauthDAL.getOauthByRefreshToken(refreshToken);      
+
+        oauthPromisse.then(function (oauth) {
+            //If not found, insert a new one
+            if (oauth == "") {
+                res.status(401);
+                return res.send("Refresh token expired");
+            } else {
+                let d = new Date();
+                let now = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds()).getTime();
+                oauth = oauth[0];
+                //The refresh token is still valid
+                if (now < oauth.expirationRefreshToken) {
+                    //Retrieve person 
+                    let personPromisse = personDAL.getPersonById(oauth.userId);
+                    personPromisse.then(function (person) {
+                        //Removes certain filed that should not be send 
+                        person.password = undefined;
+                        person.__v = undefined;
+                        
+                        let d = new Date();
+                        let expirationToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.TOKEN_TIME).getTime();
+                        let expirationRefreshToken = new Date(d.getFullYear(),d.getMonth(),d.getDate(),d.getHours(),d.getMinutes()+env.REFRESH_TOKEN_TIME).getTime();
+                        let personAux = {person, "exp":expirationToken};
+                        let accessToken = jwt.sign(JSON.stringify(personAux), 'secret');
+                        personAux = {person, "exp":expirationRefreshToken};
+                        let refreshToken = jwt.sign(JSON.stringify(personAux), 'secret');    
+
+                        return oauthDAL.authorize({
+                            userId: oauth._id,
+                            accessToken: accessToken,
+                            refreshToken: refreshToken,
+                            expirationToken: expirationToken,
+                            expirationRefreshToken: expirationRefreshToken
+                        })
+                        .then(function (response) {
+                            return res.send({
+                                person: person,
+                                accessToken: accessToken,
+                                refreshToken: refreshToken,
+                                expirationToken: expirationToken,
+                                expirationRefreshToken: expirationRefreshToken                       
+                            });
+                        })
+                        .catch(function (err) {
+                            res.status(500);
+                            return res.send("Internal error");
+                        });      
+                    });                
+                } else {
+                    res.status(401);
+                    return res.send("Refresh token expired");
+                }
+
+            }
         });
     }
 }

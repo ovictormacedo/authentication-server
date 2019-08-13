@@ -25,3 +25,15 @@ exports.getOauthByUserId = function (id) {
             return err;
         });
 }
+
+exports.getOauthByRefreshToken = function (refreshToken) {
+    return OauthModel.find({"refreshToken": refreshToken}).
+        sort({"expirationToken": -1, "expirationRefreshToken": -1}).
+        exec().
+        then(function (oauth) {
+            return oauth;
+        }).
+        catch(function (err) {
+            return err;
+        });
+}
