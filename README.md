@@ -1,9 +1,29 @@
-# Build 
+# authentication-server
+
+
+This is a simple implementation of an authentication layer based on Oauth 2.
+
+## Running
+
+Use npm version >=7.6.0
+
+```bash
+cd src/
+npm i
+node app.js
 ```
-npm install
-npm run dev
-````
-# Run
+
+## Running tests (TODO)
+
+Use npm version >=7.6.0
+
+```bash
+cd src/
+npm test
 ```
-nodemon app.js
-```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
