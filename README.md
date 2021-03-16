@@ -13,7 +13,7 @@ npm i
 node app.js
 ```
 
-## Running tests (TODO)
+## Running tests
 
 Use npm version >=7.6.0
 

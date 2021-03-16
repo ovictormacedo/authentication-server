@@ -5,18 +5,22 @@
   "main": "app.js",
   "dependencies": {
     "base64-url": "^2.3.2",
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "crypto": "^1.0.1",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
     "jsonwebtoken": "^8.5.1",
+    "mocha": "^8.3.2",
     "pg": "^8.5.1",
     "sequelize": "^6.5.0",
     "set-tz": "^0.2.0",
+    "sinon": "^9.2.4",
     "winston": "^3.3.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/**/*.js"
   },
   "repository": {
     "type": "git",

@@ -20,27 +20,27 @@ exports.authorize = async (req, res) => {
             return res.send("User not found or wrong Password");
         }
 
-        let oauth = await oauth2Dao.getOauthByUserId(user.id);      
-
+        let oauth = await oauth2Dao.getOauthByUserId(user.id);
         if (!oauth) {
             log.info("Generating first access token and refresh token for user: "+user.id)
             let authResponse = await service.authorize(user)
             authResponse.dataValues.id = undefined;
             res.status(200);
-            return res.send(authResponse);
+            return res.send(authResponse.dataValues);
         } else {
-            let now = new Date().getTime();
+            let now = Date.now();
             oauth.dataValues.id = undefined;
-            if (now < oauth.expiration_token || now < oauth.expiration_refresh_token) {
+            if (now < oauth.dataValues.expiration_token || 
+                now < oauth.dataValues.expiration_refresh_token) {
                 log.info("Token or refresh token still valid")
                 res.status(200);
-                return res.send(oauth)
+                return res.send(oauth.dataValues)
             } else {
                 log.info("Generating new access token and refresh token for user: "+user.id)
                 let authResponse = await service.authorize(user)
                 authResponse.dataValues.id = undefined;
                 res.status(200);
-                return res.send(authResponse);
+                return res.send(authResponse.dataValues);
             }
         }
     }
