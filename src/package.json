@@ -12,6 +12,7 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.5.1",
     "sequelize": "^6.5.0",
+    "set-tz": "^0.2.0",
     "winston": "^3.3.3"
   },
   "scripts": {

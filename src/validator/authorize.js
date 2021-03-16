@@ -7,6 +7,7 @@ exports.authorize = [
 ];
 
 exports.refreshToken = [
+    check("grant_type").equals("refresh"),
     check("authorization").isLength({min:8})
 ];
 

@@ -28,7 +28,7 @@ exports.authorize = async (oauth) => {
         return await oauth2Schema.create(oauth);
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }
 }
 
@@ -43,7 +43,7 @@ exports.getOauthByUserId = async (userId) => {
         })
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }
 }
 
@@ -58,7 +58,7 @@ exports.getOauthByRefreshToken = async (refreshToken) => {
         })
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }
 }
 
@@ -73,6 +73,6 @@ exports.getOauthByAccessToken = async (accessToken) => {
         })
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }
 }

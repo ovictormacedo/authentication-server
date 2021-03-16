@@ -1,6 +1,8 @@
 const crypto = require('crypto');
+const jwt = require("jsonwebtoken");
 const userDao = require("../dao/user");
 const oauth2Dao = require("../dao/oauth2");
+const log = require("../util/log");
 
 exports.signIn = async (email, password) => {
     let hash = crypto.createHash('sha512');
@@ -32,13 +34,35 @@ exports.authorize = async (user) => {
 
 exports.generateTokens = (user) => {
     let now = new Date();
-    let expirationToken = now.setSeconds(now.getSeconds()+process.env.TOKEN_TIME).getTime();
+    let expirationToken = now.setSeconds(parseInt(now.getSeconds())+parseInt(process.env.TOKEN_TIME));
+
     now = new Date();
-    let expirationRefreshToken = now.setSeconds(now.getSeconds()+process.env.REFRESH_TOKEN_TIME).getTime();
-    
+    let expirationRefreshToken = now.setSeconds(parseInt(now.getSeconds())+parseInt(process.env.REFRESH_TOKEN_TIME));
+
     let jwtPayload = {user, "exp":expirationToken};
     let accessToken = jwt.sign(JSON.stringify(jwtPayload), 'secret');
     jwtPayload = {user, "exp":expirationRefreshToken};
     let refreshToken = jwt.sign(JSON.stringify(jwtPayload), 'secret');
     return [accessToken, refreshToken, expirationToken, expirationRefreshToken]
+}
+
+exports.validateToken = async (authorization) => {
+    let accessToken = authorization.substring(7, authorization.length);
+
+    let oauth = await oauth2Dao.getOauthByAccessToken(accessToken);      
+
+    if (!oauth) {
+        log.info("Access token expired")
+        return false;
+    }
+
+    let now = new Date().getTime();
+
+    if (now < oauth.expiration_token) {
+        log.info("Valid token")
+        return true;
+    }
+
+    log.info("Access token expired")
+    return false;
 }

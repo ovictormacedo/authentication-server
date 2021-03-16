@@ -23,24 +23,22 @@ exports.authorize = async (req, res) => {
         let oauth = await oauth2Dao.getOauthByUserId(user.id);      
 
         if (!oauth) {
-            log.info("Authorizing user: "+user.id)
+            log.info("Generating first access token and refresh token for user: "+user.id)
             let authResponse = await service.authorize(user)
+            authResponse.dataValues.id = undefined;
             res.status(200);
             return res.send(authResponse);
         } else {
             let now = new Date().getTime();
-
+            oauth.dataValues.id = undefined;
             if (now < oauth.expiration_token || now < oauth.expiration_refresh_token) {
+                log.info("Token or refresh token still valid")
                 res.status(200);
-                return res.send({
-                    user: user,
-                    access_token: oauth.access_token,
-                    refresh_token: oauth.refreshToken,
-                    expiration_token: oauth.expiration_token,
-                    expiration_refresh_token: oauth.expiration_refresh_token                        
-                });   
+                return res.send(oauth)
             } else {
+                log.info("Generating new access token and refresh token for user: "+user.id)
                 let authResponse = await service.authorize(user)
+                authResponse.dataValues.id = undefined;
                 res.status(200);
                 return res.send(authResponse);
             }
@@ -66,61 +64,29 @@ exports.refreshToken = async (req, res) => {
         } else {
             let now = new Date().getTime();
 
-            if (now < oauth.expiration_refresh_token) {
+            if (now < oauth.expiration_token) {
+                oauth.dataValues.id = undefined;
+                res.status(200);
+                return res.send(oauth);  
+            } else if (now < oauth.expiration_refresh_token) {
                 let user = await userDao.getUserById(oauth.user_id);
                 user.password = undefined;
                 let tokens = service.generateTokens(user)
                 log.info("Refreshing token")
-                let oauth = await oauth2Dao.authorize({
+                oauth = await oauth2Dao.authorize({
                     user_id: user.id,
                     access_token: tokens[0],
                     refresh_token: tokens[1],
                     expiration_token: tokens[2],
                     expiration_refresh_token: tokens[3]
                 });
+                oauth.dataValues.id = undefined;
                 res.status(200);
-                return res.send({
-                    user: user,
-                    access_token: oauth.access_token,
-                    refresh_token: oauth.refresh_token,
-                    expiration_token: oauth.expiration_token,
-                    expiration_refresh_token: oauth.expiration_refresh_token                        
-                });  
+                return res.send(oauth);  
             } else {
                 log.info("Refresh token expired")
                 res.status(401);
                 return res.send("Refresh token expired");
-            }
-        }
-    }
-}
-
-exports.validateToken = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        log.info(errors)
-        res.send("Wrong parameters!");
-    } else {
-        let authorization = req.headers.authorization;
-        let accessToken = authorization.substring(7, authorization.length);
-
-        let oauth = await oauth2Dao.getOauthByAccessToken(accessToken);      
-
-        if (!oauth) {
-            log.info("Access token expired")
-            res.status(401);
-            return res.send("Access token expired");
-        } else {
-            let now = new Date().getTime();
-
-            if (now < oauth.expiration_token) {
-                log.info("Valid token")
-                res.status(200);
-                return res.send("Valid token");
-            } else {
-                log.info("Access token expired")
-                res.status(401);
-                return res.send("Access token expired");
             }
         }
     }

@@ -30,7 +30,7 @@ exports.getUserByEmailAndByPassword = async (email, password) => {
         });
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }
 }
 
@@ -41,6 +41,37 @@ exports.getUserById = async (user_id) => {
         });
     } catch (error) {
         log.error(error);
-        return false;
+        return null;
     }    
+}
+
+exports.getUserByEmail = async (email) => {
+    try {
+        return await userSchema.findOne({
+            where: {email: email}
+        });
+    } catch (error) {
+        log.error(error);
+        return null;
+    }    
+}
+
+exports.getUserByPhone = async (phone) => {
+    try {
+        return await userSchema.findOne({
+            where: {phone: phone}
+        });
+    } catch (error) {
+        log.error(error);
+        return null;
+    }    
+}
+
+exports.signUp = async (user) => {
+    try {
+        return await userSchema.create(user);
+    } catch (error) {
+        log.error(error);
+        return null;
+    }
 }
