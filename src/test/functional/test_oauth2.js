@@ -23,7 +23,7 @@ describe('Oauth2', () => {
         sinon.restore();
     });
 
-    const signInStubValue = {
+    const userStubValue = {
         "id": "4",
         "name": "Víctor",
         "last_name": "Macêdo",
@@ -31,7 +31,7 @@ describe('Oauth2', () => {
         "email": "ovictormacedo@gmail.com"
     }
 
-    const getOauthByUserIdStubValue = {
+    const oauth2StubValue = {
         "dataValues": {            
             "id": 1,
             "user_id": "4",
@@ -42,12 +42,22 @@ describe('Oauth2', () => {
         }
     }
 
+    const tokensStubValue = [
+        "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1l"+
+        "IjoiTWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ2"+
+        "1haWwuY29tIn0sImV4cCI6MTYxNjAyNjg0MzgzMn0.Tb8l2ogffCQLB5Q5NDsEoazNTYkbm0jG2KxNCrFdhWk",
+        "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoi"+
+        "TWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY"+
+        "29tIn0sImV4cCI6MTYxNjAzMDQ0MzgzMn0.Rl7AqjUSx-zJgya7yDM0j4D9e0mvE2pIPLdhg_D6hRM",
+        1616026843832, 1616030443832
+    ]
+
     
     describe("Authorize user", () => {
         it("authorize user for the first time", (done) => {
-            sinon.stub(service, "signIn").returns(signInStubValue);
+            sinon.stub(service, "signIn").returns(userStubValue);
             sinon.stub(oauth2Dao, "getOauthByUserId").returns(null);
-            sinon.stub(service, "authorize").returns(getOauthByUserIdStubValue);
+            sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
                 .post('/oauth/authorize')
@@ -70,9 +80,9 @@ describe('Oauth2', () => {
         });
 
         it("authorize user", (done) => {
-            sinon.stub(service, "signIn").returns(signInStubValue);
-            sinon.stub(oauth2Dao, "getOauthByUserId").returns(getOauthByUserIdStubValue);
-            sinon.stub(service, "authorize").returns(getOauthByUserIdStubValue);
+            sinon.stub(service, "signIn").returns(userStubValue);
+            sinon.stub(oauth2Dao, "getOauthByUserId").returns(oauth2StubValue);
+            sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
                 .post('/oauth/authorize')
@@ -84,7 +94,6 @@ describe('Oauth2', () => {
                 })
                 .end((err, res) => {
                     res.should.have.status(200);
-                    console.log(res.body)
                     res.body.should.have.property("user_id")
                     res.body.should.have.property("access_token")
                     res.body.should.have.property("refresh_token")
@@ -97,9 +106,9 @@ describe('Oauth2', () => {
 
         it("authorize user - Token or refresh token still valid", (done) => {
             sinon.useFakeTimers({now: new Date(2020, 1, 1, 0, 0)})
-            sinon.stub(service, "signIn").returns(signInStubValue);
-            sinon.stub(oauth2Dao, "getOauthByUserId").returns(getOauthByUserIdStubValue);
-            sinon.stub(service, "authorize").returns(getOauthByUserIdStubValue);
+            sinon.stub(service, "signIn").returns(userStubValue);
+            sinon.stub(oauth2Dao, "getOauthByUserId").returns(oauth2StubValue);
+            sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
                 .post('/oauth/authorize')
@@ -121,4 +130,95 @@ describe('Oauth2', () => {
                 });
         });
     });
+
+    describe("Refresh token", () => {
+        it("refresh token still valid", (done) => {
+            sinon.useFakeTimers({now: new Date(2020, 1, 1, 0, 0, 0)})
+            sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
+            
+            chai.request(app())
+                .post('/oauth/refresh')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('grant_type', 'refresh')
+                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
+                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
+                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
+                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property("user_id")
+                    res.body.should.have.property("access_token")
+                    res.body.should.have.property("refresh_token")
+                    res.body.should.have.property("expiration_token")
+                    res.body.should.have.property("expiration_refresh_token")
+                    res.body.should.not.have.property("id")
+                    done();
+                });
+        });
+
+        it("refresh token", (done) => {
+            sinon.useFakeTimers({now: new Date(2021, 2, 15, 23, 52, 0)})
+            sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
+            sinon.stub(service, "authorize").returns(oauth2StubValue);
+            sinon.stub(service, "generateTokens").returns(tokensStubValue);
+            sinon.stub(userDao, "getUserById").returns(userStubValue);
+            
+            chai.request(app())
+                .post('/oauth/refresh')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('grant_type', 'refresh')
+                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
+                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
+                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
+                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property("user_id")
+                    res.body.should.have.property("access_token")
+                    res.body.should.have.property("refresh_token")
+                    res.body.should.have.property("expiration_token")
+                    res.body.should.have.property("expiration_refresh_token")
+                    res.body.should.not.have.property("id")
+                    done();
+                });
+        });
+
+        it("does not refresh token because it was not found", (done) => {
+            sinon.useFakeTimers({now: new Date(2021, 2, 15, 23, 52, 0)})
+            sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(null);
+            
+            chai.request(app())
+                .post('/oauth/refresh')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('grant_type', 'refresh')
+                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
+                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
+                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
+                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.text.should.be.equal("Refresh token expired")
+                    done();
+                });
+        });
+
+        it("does not refresh token because it expired", (done) => {
+            sinon.useFakeTimers({now: new Date(2021, 6, 15, 23, 52, 0)})
+            sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
+            
+            chai.request(app())
+                .post('/oauth/refresh')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('grant_type', 'refresh')
+                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
+                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
+                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
+                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.text.should.be.equal("Refresh token expired")
+                    done();
+                });
+        });
+    })
 });

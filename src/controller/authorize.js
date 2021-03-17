@@ -55,20 +55,19 @@ exports.refreshToken = async (req, res) => {
         let authorization = req.headers.authorization;
         let refreshToken = authorization.substring(7, authorization.length);
 
-        let oauth = await oauth2Dao.getOauthByRefreshToken(refreshToken);      
+        let oauth = await oauth2Dao.getOauthByRefreshToken(refreshToken);
 
         if (!oauth) {
             log.info("Refresh token expired")
             res.status(401);
             return res.send("Refresh token expired");
         } else {
-            let now = new Date().getTime();
-
-            if (now < oauth.expiration_token) {
+            let now = Date.now();
+            if (now < oauth.dataValues.expiration_token) {
                 oauth.dataValues.id = undefined;
                 res.status(200);
-                return res.send(oauth);  
-            } else if (now < oauth.expiration_refresh_token) {
+                return res.send(oauth.dataValues);  
+            } else if (now < oauth.dataValues.expiration_refresh_token) {
                 let user = await userDao.getUserById(oauth.user_id);
                 user.password = undefined;
                 let tokens = service.generateTokens(user)
@@ -82,7 +81,7 @@ exports.refreshToken = async (req, res) => {
                 });
                 oauth.dataValues.id = undefined;
                 res.status(200);
-                return res.send(oauth);  
+                return res.send(oauth.dataValues);  
             } else {
                 log.info("Refresh token expired")
                 res.status(401);

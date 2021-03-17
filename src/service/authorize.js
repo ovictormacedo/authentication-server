@@ -56,7 +56,7 @@ exports.validateToken = async (authorization) => {
         return false;
     }
 
-    let now = new Date().getTime();
+    let now = Date().now();
 
     if (now < oauth.expiration_token) {
         log.info("Valid token")
