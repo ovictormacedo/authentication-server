@@ -12,14 +12,14 @@ exports.getUserById = async (req, res) => {
         res.send(errors);
     } else {
         let user = await userDao.getUserById(req.params.user_id);
-        user.password = undefined;
         if (user) {
+            user.password = undefined;
             log.info(user)
             res.status(200);
             res.send(user);
         } else {
             log.info("User not found")
-            res.status(400);
+            res.status(200);
             res.send("User not found");
         }
     }
@@ -33,14 +33,14 @@ exports.getUserByEmail = async (req, res) => {
         res.send(errors);
     } else {
         let user = await userDao.getUserByEmail(req.params.email);
-        user.password = undefined;
         if (user) {
+            user.password = undefined;
             log.info(user)
             res.status(200);
             res.send(user);
         } else {
             log.info("User not found")
-            res.status(400);
+            res.status(200);
             res.send("User not found");
         }
     }
@@ -54,14 +54,14 @@ exports.getUserByPhone = async (req, res) => {
         res.send(errors);
     } else {
         let user = await userDao.getUserByPhone(req.params.phone);
-        user.password = undefined;
         if (user) {
+            user.password = undefined;
             log.info(user)
             res.status(200);
             res.send(user);
         } else {
             log.info("User not found")
-            res.status(400);
+            res.status(200);
             res.send("User not found");
         }
     }
@@ -97,12 +97,12 @@ exports.signUp = async (req, res) => {
 
         if (user) {
             user.password = undefined
-            log.info(user)
+            log.info("Sign up user: "+user)
             res.status(200);
             res.send(user);
         } else {
             log.info("It was not able to sign up user")
-            res.status(400);
+            res.status(500);
             res.send("It was not able to sign up user");
         }
     }

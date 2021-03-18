@@ -35,21 +35,18 @@ describe('Oauth2', () => {
         "dataValues": {            
             "id": 1,
             "user_id": "4",
-            "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MTYxNTg1OTU4MTkyMH0.H1yWyZMWbZngrRlmmkqT8TLjjykZ2qETrtgdpHUak1w",
-            "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MTYxNTg2MzE4MTkyMH0.tZuA48RU1FjVo5W-78sCfnfGO6a8wDj4TWRFIjUMRM0",
+            "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNSIsIm5hbWUiOiJUZXN0IiwibGFzdF9uYW1lIjoiVGVzdCIsInBob25lIjoiKzU1MzI5MDAwMDAwMDAiLCJlbWFpbCI6InRlc3RAZW1haWwuY29tIn0sImV4cCI6MTYxNjAzMjEzMjMyMH0.vThbeVYiexs6ii9oxKTNnqw6A4ilk84G6RLTnyUGpGw",
+            "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNSIsIm5hbWUiOiJUZXN0IiwibGFzdF9uYW1lIjoiVGVzdCIsInBob25lIjoiKzU1MzI5MDAwMDAwMDAiLCJlbWFpbCI6InRlc3RAZW1haWwuY29tIn0sImV4cCI6MTYxNjAzNTczMjMyMX0.ncGLDPzcJ4aJsj7GlNsAIwTRoKYg1HwI82U0A5lSKS4",
             "expiration_token": 1615859581920,
             "expiration_refresh_token": 1615863181920
         }
     }
 
     const tokensStubValue = [
-        "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1l"+
-        "IjoiTWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ2"+
-        "1haWwuY29tIn0sImV4cCI6MTYxNjAyNjg0MzgzMn0.Tb8l2ogffCQLB5Q5NDsEoazNTYkbm0jG2KxNCrFdhWk",
-        "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNCIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoi"+
-        "TWFjw6pkbyIsInBob25lIjoiKzU1MzI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY"+
-        "29tIn0sImV4cCI6MTYxNjAzMDQ0MzgzMn0.Rl7AqjUSx-zJgya7yDM0j4D9e0mvE2pIPLdhg_D6hRM",
-        1616026843832, 1616030443832
+        oauth2StubValue["dataValues"]["access_token"],
+        oauth2StubValue["dataValues"]["refresh_token"],
+        oauth2StubValue["dataValues"]["expiration_token"],
+        oauth2StubValue["dataValues"]["expiration_refresh_token"],   
     ]
 
     
