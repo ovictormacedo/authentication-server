@@ -4,6 +4,7 @@ const oauth2Dao = require("../dao/oauth2");
 const userDao = require("../dao/user");
 const service = require("../service/authorize")
 const log = require("../util/log");
+const time = require("../service/time")
 
 exports.authorize = async (req, res) => {
     const errors = validationResult(req);
@@ -28,7 +29,7 @@ exports.authorize = async (req, res) => {
             res.status(200);
             return res.send(authResponse.dataValues);
         } else {
-            let now = Date.now();
+            let now = time.getTimestampNow();
             oauth.dataValues.id = undefined;
             if (now < oauth.dataValues.expiration_token || 
                 now < oauth.dataValues.expiration_refresh_token) {
@@ -62,7 +63,7 @@ exports.refreshToken = async (req, res) => {
             res.status(401);
             return res.send("Refresh token expired");
         } else {
-            let now = Date.now();
+            let now = time.getTimestampNow();
             if (now < oauth.dataValues.expiration_token) {
                 oauth.dataValues.id = undefined;
                 res.status(200);
@@ -89,4 +90,13 @@ exports.refreshToken = async (req, res) => {
             }
         }
     }
+}
+
+exports.validateToken = async (req, res) => {
+    let valid = await service.validateToken(req.headers.authorization);
+    res.status(200);
+    if (valid)
+        return res.send("Valid token");
+    else
+        return res.send("Invalid token");
 }

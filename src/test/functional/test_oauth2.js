@@ -1,5 +1,6 @@
 process.env.NODE_ENV = 'test';
 process.env.APP_LOG_PATH="./oauth2.log"
+process.env.OAUTH2_SECRET = "secret"
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -10,6 +11,7 @@ let { app } = require('../../bootstrap/app')
 const userDao = require("../../dao/user")
 const oauth2Dao = require("../../dao/oauth2")
 const service = require("../../service/authorize")
+const time = require("../../service/time")
 
 
 chai.use(chaiHttp);
@@ -102,7 +104,7 @@ describe('Oauth2', () => {
         });
 
         it("authorize user - Token or refresh token still valid", (done) => {
-            sinon.useFakeTimers({now: new Date(2020, 1, 1, 0, 0)})
+            sinon.stub(time, "getTimestampNow").returns(1612148400000);
             sinon.stub(service, "signIn").returns(userStubValue);
             sinon.stub(oauth2Dao, "getOauthByUserId").returns(oauth2StubValue);
             sinon.stub(service, "authorize").returns(oauth2StubValue);
@@ -130,17 +132,14 @@ describe('Oauth2', () => {
 
     describe("Refresh token", () => {
         it("refresh token still valid", (done) => {
-            sinon.useFakeTimers({now: new Date(2020, 1, 1, 0, 0, 0)})
+            sinon.stub(time, "getTimestampNow").returns(1612148400000);
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
             
             chai.request(app())
                 .post('/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
-                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
-                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
-                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
-                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property("user_id")
@@ -154,7 +153,7 @@ describe('Oauth2', () => {
         });
 
         it("refresh token", (done) => {
-            sinon.useFakeTimers({now: new Date(2021, 2, 15, 23, 52, 0)})
+            sinon.stub(time, "getTimestampNow").returns(1615863120000);
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
             sinon.stub(service, "authorize").returns(oauth2StubValue);
             sinon.stub(service, "generateTokens").returns(tokensStubValue);
@@ -164,10 +163,7 @@ describe('Oauth2', () => {
                 .post('/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
-                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
-                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
-                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
-                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property("user_id")
@@ -181,17 +177,14 @@ describe('Oauth2', () => {
         });
 
         it("does not refresh token because it was not found", (done) => {
-            sinon.useFakeTimers({now: new Date(2021, 2, 15, 23, 52, 0)})
+            sinon.stub(time, "getTimestampNow").returns(1615863120000);
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(null);
             
             chai.request(app())
                 .post('/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
-                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
-                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
-                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
-                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(401);
                     res.text.should.be.equal("Refresh token expired")
@@ -200,22 +193,50 @@ describe('Oauth2', () => {
         });
 
         it("does not refresh token because it expired", (done) => {
-            sinon.useFakeTimers({now: new Date(2021, 6, 15, 23, 52, 0)})
+            sinon.stub(time, "getTimestampNow").returns(1626403920000);
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
             
             chai.request(app())
                 .post('/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
-                .set('authorization', "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiN"+
-                "CIsIm5hbWUiOiJWw61jdG9yIiwibGFzdF9uYW1lIjoiTWFjw6pkbyIsInBob25lIjoiKzU1M"+
-                "zI5ODQ3NDc4MDgiLCJlbWFpbCI6Im92aWN0b3JtYWNlZG9AZ21haWwuY29tIn0sImV4cCI6MT"+
-                "YxNTg2NTU5NTQ1OH0.V1UMhUtonxOlg7hLnJdfoZwaS6DgG8nU5CHds8E9gic")
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(401);
                     res.text.should.be.equal("Refresh token expired")
                     done();
                 });
         });
-    })
+    });
+
+    describe("Validate token", () => {
+        it("token still valid", (done) => {
+            sinon.stub(time, "getTimestampNow").returns(1615863120000);
+
+            chai.request(app())
+                .post('/oauth/validate')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('grant_type', 'refresh')
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.text.should.be.equal("Valid token")
+                    done();
+                });
+        });
+
+        it("invalid token", (done) => {
+            sinon.stub(time, "getTimestampNow").returns(1623811920000);
+            
+            chai.request(app())
+                .post('/oauth/validate')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.text.should.be.equal("Invalid token")
+                    done();
+                });
+        });
+    });
 });

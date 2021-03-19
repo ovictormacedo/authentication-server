@@ -16,6 +16,12 @@ exports.router = app => {
         authValidator.refreshToken,
         authController.refreshToken
     );
+
+    app.post(
+        "/oauth/validate",
+        authValidator.validateToken,
+        authController.validateToken
+    );
     
     app.get(
         "/user/id/:user_id",
