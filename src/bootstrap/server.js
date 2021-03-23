@@ -5,7 +5,7 @@ const setTZ = require('set-tz')
 setTZ('UTC')
 
 exports.webServer = (app) => {
-    http.createServer({}, app).listen(process.env.PORT, function(){
-        log.info("Oauth 2/User API listening on port " + process.env.PORT);
+    http.createServer({}, app).listen(process.env.APPLICATION_PORT, function(){
+        log.info("Oauth 2/User API listening on port " + process.env.APPLICATION_PORT);
     });
 }
