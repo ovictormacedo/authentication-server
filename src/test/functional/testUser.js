@@ -22,15 +22,31 @@ describe('User', () => {
         "phone": "+5532900000000",
         "email": "test@email.com",
         "password": "test",
+        "roles": [
+            {
+                "id": "3",
+                "name": "tenant"
+            }
+        ],
     }
+
+    let userPayload = new Object();
 
     before(() => {
         router(app());
+        Object.assign(userPayload, userStubValue);
+        userPayload.roles = undefined;
+        userPayload.id = undefined;
+        userPayload.role = "tenant";
     });
 
     afterEach(() => {
         sinon.restore();
         userStubValue["password"] = "test"
+        Object.assign(userPayload, userStubValue);
+        userPayload.roles = undefined;
+        userPayload.id = undefined;
+        userPayload.role = "tenant";
     });
 
     const oauth2StubValue = {
@@ -173,7 +189,7 @@ describe('User', () => {
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
-                .send(userStubValue)
+                .send(userPayload)
                 .end((err, res) => {
                     res.should.have.status(400);
                     res.text.should.be.equal("Email already used")
@@ -191,7 +207,7 @@ describe('User', () => {
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
-                .send(userStubValue)
+                .send(userPayload)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property("id")
@@ -214,7 +230,7 @@ describe('User', () => {
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
-                .send(userStubValue)
+                .send(userPayload)
                 .end((err, res) => {
                     res.should.have.status(500);
                     res.text.should.be.equal("It was not able to sign up user")
@@ -226,14 +242,14 @@ describe('User', () => {
             sinon.stub(userDao, "getUserByEmail").returns(null);
             sinon.stub(userDao, "signUp").returns(null);
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
-            userStubValue.password = undefined;
+            userPayload.password = undefined;
 
             chai.request(app())
                 .post('/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
-                .send(userStubValue)
+                .send(userPayload)
                 .end((err, res) => {
                     res.should.have.status(400);
                     res.text.should.be.equal('{"errors":[{"msg":"Invalid value","param":"password","location":"body"}]}')

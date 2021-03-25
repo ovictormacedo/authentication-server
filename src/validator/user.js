@@ -1,4 +1,4 @@
-const { check, param, header } = require('express-validator');
+const { param, header, body, oneOf } = require('express-validator');
 const service = require("../service/authorize")
 
 exports.getUserById = [
@@ -32,9 +32,13 @@ exports.getUserByPhone = [
 ];
 
 exports.signUp = [
-    check("name").isLength({min:1, max: 50}),
-    check("last_name").isLength({min:1, max: 50}),
-    check("phone").isLength({min:14, max: 15}),
-    check("email").isEmail(),
-    check("password").isLength({min:1, max: 20}),
+    body("name").isLength({min:1, max: 50}),
+    body("last_name").isLength({min:1, max: 50}),
+    body("phone").isLength({min:14, max: 15}),
+    body("email").isEmail(),
+    body("password").isLength({min:1, max: 20}),
+    oneOf([
+        body("role").equals("tenant"),
+        body("role").equals("locator"),
+    ])
 ];

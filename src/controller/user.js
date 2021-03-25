@@ -93,7 +93,7 @@ exports.signUp = async (req, res) => {
             phone: req.body.phone,
             email: req.body.email,
             password: passwordHashed,
-        });
+        }, req.body.role);
 
         if (user) {
             user.password = undefined

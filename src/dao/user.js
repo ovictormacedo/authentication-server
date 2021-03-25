@@ -25,10 +25,27 @@ const userSchema = conf.sequelize.define('user', {
     tableName: "user",
 });
 
+const roleSchema = conf.sequelize.define('role', {
+    name: {
+        type: DataTypes.STRING
+    },
+},{
+    timestamps: false,
+    paranoid: false,
+    tableName: "role",
+});
+
+const userRoleSchema = conf.sequelize.define('user_role', {},
+{timestamps: false, paranoid: false, tableName: "user_role"});
+
+userSchema.belongsToMany(roleSchema, { through: userRoleSchema });
+roleSchema.belongsToMany(userSchema, { through: userRoleSchema });
+
 exports.getUserByEmailAndByPassword = async (email, password) => {
     try {
         return await userSchema.findOne({
-            where: {email: email, password: password}
+            where: {email: email, password: password},
+            include: roleSchema,
         });
     } catch (error) {
         log.error(error);
@@ -39,7 +56,8 @@ exports.getUserByEmailAndByPassword = async (email, password) => {
 exports.getUserById = async (user_id) => {
     try {
         return await userSchema.findOne({
-            where: {id: user_id}
+            where: {id: user_id},
+            include: roleSchema,
         });
     } catch (error) {
         log.error(error);
@@ -50,7 +68,8 @@ exports.getUserById = async (user_id) => {
 exports.getUserByEmail = async (email) => {
     try {
         return await userSchema.findOne({
-            where: {email: email}
+            where: {email: email},
+            include: roleSchema,
         });
     } catch (error) {
         log.error(error);
@@ -61,7 +80,8 @@ exports.getUserByEmail = async (email) => {
 exports.getUserByPhone = async (phone) => {
     try {
         return await userSchema.findOne({
-            where: {phone: phone}
+            where: {phone: phone},
+            include: roleSchema,
         });
     } catch (error) {
         log.error(error);
@@ -69,9 +89,12 @@ exports.getUserByPhone = async (phone) => {
     }    
 }
 
-exports.signUp = async (user) => {
+exports.signUp = async (user, roleName) => {
     try {
-        return await userSchema.create(user);
+        let role = await roleSchema.findOne({where: {name: roleName}});
+        let payload = user;
+        payload.roles = [role];
+        return await userSchema.create(payload, {include: roleSchema})
     } catch (error) {
         log.error(error);
         return null;
