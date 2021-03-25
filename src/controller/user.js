@@ -7,18 +7,18 @@ const crypto = require('crypto');
 exports.getUserById = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("getUserById: Validation error")
         res.status(400);
         res.send(errors);
     } else {
         let user = await userDao.getUserById(req.params.user_id);
         if (user) {
             user.password = undefined;
-            log.info(user)
+            log.info("getUserById: Success")
             res.status(200);
             res.send(user);
         } else {
-            log.info("User not found")
+            log.info("getUserById: User not found")
             res.status(200);
             res.send("User not found");
         }
@@ -28,18 +28,18 @@ exports.getUserById = async (req, res) => {
 exports.getUserByEmail = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("getUserByEmail: Validation error")
         res.status(400);
         res.send(errors);
     } else {
         let user = await userDao.getUserByEmail(req.params.email);
         if (user) {
             user.password = undefined;
-            log.info(user)
+            log.info("getUserByEmail: Success")
             res.status(200);
             res.send(user);
         } else {
-            log.info("User not found")
+            log.info("getUserByEmail: User not found")
             res.status(200);
             res.send("User not found");
         }
@@ -49,18 +49,18 @@ exports.getUserByEmail = async (req, res) => {
 exports.getUserByPhone = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("getUserByPhone: getUserByPhone")
         res.status(400);
         res.send(errors);
     } else {
         let user = await userDao.getUserByPhone(req.params.phone);
         if (user) {
             user.password = undefined;
-            log.info(user)
+            log.info("getUserByPhone: Success")
             res.status(200);
             res.send(user);
         } else {
-            log.info("User not found")
+            log.info("getUserByPhone: User not found")
             res.status(200);
             res.send("User not found");
         }
@@ -70,7 +70,7 @@ exports.getUserByPhone = async (req, res) => {
 exports.signUp = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("signUp: Validation error")
         res.status(400);
         res.send(errors);
     } else {
@@ -81,7 +81,7 @@ exports.signUp = async (req, res) => {
         let user = await userDao.getUserByEmail(req.body.email);
 
         if (user != null) {
-            log.info(user)
+            log.info("signUp: Success")
             log.info("Email already used")
             res.status(400);
             return res.send("Email already used");
@@ -97,11 +97,11 @@ exports.signUp = async (req, res) => {
 
         if (user) {
             user.password = undefined
-            log.info("Sign up user: "+user)
+            log.info("signUp: Success")
             res.status(200);
             res.send(user);
         } else {
-            log.info("It was not able to sign up user")
+            log.info("signUp: It was not able to sign up user")
             res.status(500);
             res.send("It was not able to sign up user");
         }

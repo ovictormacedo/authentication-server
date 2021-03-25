@@ -9,21 +9,21 @@ const time = require("../service/time")
 exports.authorize = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("authorize: Validation error")
         res.status(400);
         res.send(errors);
     } else {
         let user = await service.signIn(req.body.username, req.body.password)
 
         if (!user) {
-            log.info("User not found: "+req.body.username)
+            log.info("authorize: User not found or wrong Password: "+req.body.username)
             res.status(401);
             return res.send("User not found or wrong Password");
         }
 
         let oauth = await oauth2Dao.getOauthByUserId(user.id);
         if (!oauth) {
-            log.info("Generating first access token and refresh token for user: "+user.id)
+            log.info("authorize: Generating first access token and refresh token for user: "+user.id)
             let authResponse = await service.authorize(user)
             authResponse.dataValues.id = undefined;
             res.status(200);
@@ -33,11 +33,11 @@ exports.authorize = async (req, res) => {
             oauth.dataValues.id = undefined;
             if (now < oauth.dataValues.expiration_token || 
                 now < oauth.dataValues.expiration_refresh_token) {
-                log.info("Token or refresh token still valid")
+                log.info("authorize: Token or refresh token still valid")
                 res.status(200);
                 return res.send(oauth.dataValues)
             } else {
-                log.info("Generating new access token and refresh token for user: "+user.id)
+                log.info("authorize: Generating new access token and refresh token for user: "+user.id)
                 let authResponse = await service.authorize(user)
                 authResponse.dataValues.id = undefined;
                 res.status(200);
@@ -50,7 +50,7 @@ exports.authorize = async (req, res) => {
 exports.refreshToken = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        log.info(errors)
+        log.info("refreshToken: Validation error")
         res.send("Wrong parameters!");
     } else {
         let authorization = req.headers.authorization;
@@ -59,7 +59,7 @@ exports.refreshToken = async (req, res) => {
         let oauth = await oauth2Dao.getOauthByRefreshToken(refreshToken);
 
         if (!oauth) {
-            log.info("Refresh token expired")
+            log.info("refreshToken: Refresh token expired")
             res.status(401);
             return res.send("Refresh token expired");
         } else {
@@ -72,7 +72,7 @@ exports.refreshToken = async (req, res) => {
                 let user = await userDao.getUserById(oauth.user_id);
                 user.password = undefined;
                 let tokens = service.generateTokens(user)
-                log.info("Refreshing token")
+                log.info("refreshToken: Refreshing token")
                 oauth = await oauth2Dao.authorize({
                     user_id: user.id,
                     access_token: tokens[0],
@@ -84,7 +84,7 @@ exports.refreshToken = async (req, res) => {
                 res.status(200);
                 return res.send(oauth.dataValues);  
             } else {
-                log.info("Refresh token expired")
+                log.info("refreshToken: Refresh token expired")
                 res.status(401);
                 return res.send("Refresh token expired");
             }
@@ -95,8 +95,12 @@ exports.refreshToken = async (req, res) => {
 exports.validateToken = async (req, res) => {
     let valid = await service.validateToken(req.headers.authorization);
     res.status(200);
-    if (valid)
+    if (valid) {
+        log.info("validateToken: Valid token")
         return res.send("Valid token");
-    else
+    }
+    else {
+        log.info("validateToken: Invalid token")
         return res.send("Invalid token");
+    }
 }
