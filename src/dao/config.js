@@ -8,5 +8,14 @@ exports.sequelize = new Sequelize({
     username: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     dialect: process.env.DATABASE_DIALECT,
-    logging: false
+    logging: false,
+    define: {
+        timestamps: true,
+        underscored: true,
+        underscoredAll: true,
+        paranoid: true,
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+        deletedAt: "deleted_at",
+    }
 });

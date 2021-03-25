@@ -18,8 +18,10 @@ const oauth2Schema = conf.sequelize.define('oauth2', {
     expiration_refresh_token: {
         type: DataTypes.INTEGER
     },
+    created_at: { type: DataTypes.DATE },
+    updated_at: { type: DataTypes.DATE },
+    deleted_at: { type: DataTypes.DATE },
 },{
-    timestamps: false,
     tableName: "oauth2",
 });
 

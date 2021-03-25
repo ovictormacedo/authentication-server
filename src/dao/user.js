@@ -18,8 +18,10 @@ const userSchema = conf.sequelize.define('user', {
     password: {
         type: DataTypes.STRING
     },
+    created_at: { type: DataTypes.DATE },
+    updated_at: { type: DataTypes.DATE },
+    deleted_at: { type: DataTypes.DATE },
 },{
-    timestamps: false,
     tableName: "user",
 });
 
