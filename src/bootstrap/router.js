@@ -4,45 +4,47 @@ let authController = require("../controller/authorize");
 let userValidator = require("../validator/user");
 let userController = require("../controller/user");
 
+BASE_ROUTE = "/api/authentication"
+
 exports.router = app => {
     app.post(
-        "/oauth/authorize",
+        `${BASE_ROUTE}/oauth/authorize`,
         authValidator.authorize,
         authController.authorize
     );
 
     app.post(
-        "/oauth/refresh",
+        `${BASE_ROUTE}/oauth/refresh`,
         authValidator.refreshToken,
         authController.refreshToken
     );
 
     app.post(
-        "/oauth/validate",
+        `${BASE_ROUTE}/oauth/validate`,
         authValidator.validateToken,
         authController.validateToken
     );
     
     app.get(
-        "/user/id/:user_id",
+        `${BASE_ROUTE}/user/id/:user_id`,
         userValidator.getUserById,
         userController.getUserById
     );
 
     app.get(
-        "/user/email/:email",
+        `${BASE_ROUTE}/user/email/:email`,
         userValidator.getUserByEmail,
         userController.getUserByEmail
     );
 
     app.get(
-        "/user/phone/:phone",
+        `${BASE_ROUTE}/user/phone/:phone`,
         userValidator.getUserByPhone,
         userController.getUserByPhone
     );
 
     app.post(
-        "/user/signup",
+        `${BASE_ROUTE}/user/signup`,
         userValidator.signUp,
         userController.signUp
     );

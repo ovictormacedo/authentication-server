@@ -59,7 +59,7 @@ describe('Oauth2', () => {
             sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
-                .post('/oauth/authorize')
+                .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .send({
@@ -84,7 +84,7 @@ describe('Oauth2', () => {
             sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
-                .post('/oauth/authorize')
+                .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .send({
@@ -110,7 +110,7 @@ describe('Oauth2', () => {
             sinon.stub(service, "authorize").returns(oauth2StubValue);
             
             chai.request(app())
-                .post('/oauth/authorize')
+                .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .send({
@@ -136,7 +136,7 @@ describe('Oauth2', () => {
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
             
             chai.request(app())
-                .post('/oauth/refresh')
+                .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -160,7 +160,7 @@ describe('Oauth2', () => {
             sinon.stub(userDao, "getUserById").returns(userStubValue);
             
             chai.request(app())
-                .post('/oauth/refresh')
+                .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -181,7 +181,7 @@ describe('Oauth2', () => {
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(null);
             
             chai.request(app())
-                .post('/oauth/refresh')
+                .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -197,7 +197,7 @@ describe('Oauth2', () => {
             sinon.stub(oauth2Dao, "getOauthByRefreshToken").returns(oauth2StubValue);
             
             chai.request(app())
-                .post('/oauth/refresh')
+                .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -214,7 +214,7 @@ describe('Oauth2', () => {
             sinon.stub(time, "getTimestampNow").returns(1615863120000);
 
             chai.request(app())
-                .post('/oauth/validate')
+                .post('/api/authentication/oauth/validate')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -229,7 +229,7 @@ describe('Oauth2', () => {
             sinon.stub(time, "getTimestampNow").returns(1623811920000);
             
             chai.request(app())
-                .post('/oauth/validate')
+                .post('/api/authentication/oauth/validate')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {

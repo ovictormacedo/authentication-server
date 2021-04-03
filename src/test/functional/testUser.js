@@ -74,7 +74,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/id/1')
+                .get('/api/authentication/user/id/1')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -95,7 +95,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/id/1')
+                .get('/api/authentication/user/id/1')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -111,7 +111,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/email/test@email.com')
+                .get('/api/authentication/user/email/test@email.com')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -132,7 +132,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/email/test@email.com')
+                .get('/api/authentication/user/email/test@email.com')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -148,7 +148,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/phone/+5532900000000')
+                .get('/api/authentication/user/phone/+5532900000000')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -169,7 +169,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .get('/user/phone/+5532900000000')
+                .get('/api/authentication/user/phone/+5532900000000')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -185,7 +185,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .post('/user/signup')
+                .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -203,7 +203,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .post('/user/signup')
+                .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -226,7 +226,7 @@ describe('User', () => {
             sinon.stub(service, "validateToken").returns(Promise.resolve(true));
             
             chai.request(app())
-                .post('/user/signup')
+                .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
@@ -245,7 +245,7 @@ describe('User', () => {
             userPayload.password = undefined;
 
             chai.request(app())
-                .post('/user/signup')
+                .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('grant_type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
