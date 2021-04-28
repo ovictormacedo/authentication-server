@@ -8,8 +8,8 @@ const sinon = require("sinon")
 const { router } = require("../../bootstrap/router")
 let { app } = require('../../bootstrap/app')
 const userDao = require("../../dao/user")
-const oauth2Dao = require("../../dao/oauth2")
 const service = require("../../service/authorize")
+const { BadRequestResult } = require("../../util/errorMessages")
 
 
 chai.use(chaiHttp);
@@ -22,6 +22,8 @@ describe('User', () => {
         "phone": "+5532900000000",
         "email": "test@email.com",
         "password": "test",
+        "document": "11111111111111",
+        "document_type": "CPF",
         "roles": [
             {
                 "id": "3",
@@ -76,7 +78,7 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/id/1')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -97,11 +99,13 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/id/1')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.text.should.be.equal("User not found")
+                    res.should.have.status(400);
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("User not found", "user_id"))
+                    )
                     done();
                 });
         });
@@ -113,7 +117,7 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/email/test@email.com')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -134,11 +138,13 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/email/test@email.com')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.text.should.be.equal("User not found")
+                    res.should.have.status(400);
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("User not found", "email"))
+                    )
                     done();
                 });
         });
@@ -150,7 +156,7 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/phone/+5532900000000')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -171,11 +177,13 @@ describe('User', () => {
             chai.request(app())
                 .get('/api/authentication/user/phone/+5532900000000')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.text.should.be.equal("User not found")
+                    res.should.have.status(400);
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("User not found", "phone"))
+                    )
                     done();
                 });
         });
@@ -187,12 +195,14 @@ describe('User', () => {
             chai.request(app())
                 .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .send(userPayload)
                 .end((err, res) => {
                     res.should.have.status(400);
-                    res.text.should.be.equal("Email already used")
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("Email already used", "email"))
+                    )
                     done();
                 });
         });
@@ -205,7 +215,7 @@ describe('User', () => {
             chai.request(app())
                 .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .send(userPayload)
                 .end((err, res) => {
@@ -228,7 +238,7 @@ describe('User', () => {
             chai.request(app())
                 .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .send(userPayload)
                 .end((err, res) => {
@@ -247,7 +257,7 @@ describe('User', () => {
             chai.request(app())
                 .post('/api/authentication/user/signup')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .send(userPayload)
                 .end((err, res) => {

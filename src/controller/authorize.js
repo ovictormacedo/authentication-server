@@ -5,6 +5,7 @@ const userDao = require("../dao/user");
 const service = require("../service/authorize")
 const log = require("../util/log");
 const time = require("../service/time")
+const { BadRequestResult } = require("../util/errorMessages")
 
 exports.authorize = async (req, res) => {
     const errors = validationResult(req);
@@ -18,7 +19,7 @@ exports.authorize = async (req, res) => {
         if (!user) {
             log.info("authorize: User not found or wrong Password: "+req.body.username)
             res.status(401);
-            return res.send("User not found or wrong Password");
+            return res.send(BadRequestResult("User not found or wrong Password", "username"));
         }
 
         let oauth = await oauth2Dao.getOauthByUserId(user.id);
@@ -61,7 +62,7 @@ exports.refreshToken = async (req, res) => {
         if (!oauth) {
             log.info("refreshToken: Refresh token expired")
             res.status(401);
-            return res.send("Refresh token expired");
+            return res.send(BadRequestResult("Refresh token expired", "token"));
         } else {
             let now = time.getTimestampNow();
             if (now < oauth.dataValues.expiration_token) {
@@ -86,7 +87,7 @@ exports.refreshToken = async (req, res) => {
             } else {
                 log.info("refreshToken: Refresh token expired")
                 res.status(401);
-                return res.send("Refresh token expired");
+                return res.send(BadRequestResult("Refresh token expired", "token"));
             }
         }
     }
@@ -101,6 +102,6 @@ exports.validateToken = async (req, res) => {
     }
     else {
         log.info("validateToken: Invalid token")
-        return res.send("Invalid token");
+        return res.send(BadRequestResult("Invalid token", "token"));
     }
 }

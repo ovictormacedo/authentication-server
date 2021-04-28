@@ -34,11 +34,14 @@ exports.getUserByPhone = [
 exports.signUp = [
     body("name").isLength({min:1, max: 50}),
     body("last_name").isLength({min:1, max: 50}),
-    body("phone").isLength({min:14, max: 15}),
+    body("phone").isLength({min:10, max: 15}),
     body("email").isEmail(),
-    body("password").isLength({min:1, max: 20}),
+    body("password").isLength({min:1, max: 10}),
     oneOf([
         body("role").equals("tenant"),
-        body("role").equals("locator"),
-    ])
+        body("role").equals("realtor"),
+        body("role").equals("proprietary"),
+    ]),
+    body("document").isLength({min:14, max: 15}),
+    body("document_type").isString(),
 ];

@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const userDao = require("../dao/user");
 const log = require("../util/log");
 const crypto = require('crypto');
+const { BadRequestResult } = require("../util/errorMessages")
 
 exports.getUserById = async (req, res) => {
     const errors = validationResult(req);
@@ -19,8 +20,8 @@ exports.getUserById = async (req, res) => {
             res.send(user);
         } else {
             log.info("getUserById: User not found")
-            res.status(200);
-            res.send("User not found");
+            res.status(400);
+            res.send(BadRequestResult("User not found", "user_id"));
         }
     }
 }
@@ -40,8 +41,8 @@ exports.getUserByEmail = async (req, res) => {
             res.send(user);
         } else {
             log.info("getUserByEmail: User not found")
-            res.status(200);
-            res.send("User not found");
+            res.status(400);
+            res.send(BadRequestResult("User not found", "email"));
         }
     }
 }
@@ -61,8 +62,8 @@ exports.getUserByPhone = async (req, res) => {
             res.send(user);
         } else {
             log.info("getUserByPhone: User not found")
-            res.status(200);
-            res.send("User not found");
+            res.status(400);
+            res.send(BadRequestResult("User not found", "phone"));
         }
     }
 }
@@ -84,7 +85,7 @@ exports.signUp = async (req, res) => {
             log.info("signUp: Success")
             log.info("Email already used")
             res.status(400);
-            return res.send("Email already used");
+            return res.send(BadRequestResult("Email already used", "email"));
         }
 
         user = await userDao.signUp({
@@ -92,6 +93,8 @@ exports.signUp = async (req, res) => {
             last_name: req.body.last_name,
             phone: req.body.phone,
             email: req.body.email,
+            document: req.body.document,
+            document_type: req.body.document_type,
             password: passwordHashed,
         }, req.body.role);
 

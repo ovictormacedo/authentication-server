@@ -12,6 +12,7 @@ const userDao = require("../../dao/user")
 const oauth2Dao = require("../../dao/oauth2")
 const service = require("../../service/authorize")
 const time = require("../../service/time")
+const { BadRequestResult } = require("../../util/errorMessages")
 
 
 chai.use(chaiHttp);
@@ -61,7 +62,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .send({
                     "username": "ovictormacedo@gmail.com",
                     "password": "test",
@@ -86,7 +87,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .send({
                     "username": "ovictormacedo@gmail.com",
                     "password": "test",
@@ -112,7 +113,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/authorize')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'password')
+                .set('grant-type', 'password')
                 .send({
                     "username": "ovictormacedo@gmail.com",
                     "password": "test",
@@ -138,7 +139,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'refresh')
+                .set('grant-type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -162,7 +163,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'refresh')
+                .set('grant-type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -183,11 +184,13 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'refresh')
+                .set('grant-type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(401);
-                    res.text.should.be.equal("Refresh token expired")
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("Refresh token expired", "token"))
+                    )
                     done();
                 });
         });
@@ -199,11 +202,13 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/refresh')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'refresh')
+                .set('grant-type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(401);
-                    res.text.should.be.equal("Refresh token expired")
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("Refresh token expired", "token"))
+                    )
                     done();
                 });
         });
@@ -216,7 +221,7 @@ describe('Oauth2', () => {
             chai.request(app())
                 .post('/api/authentication/oauth/validate')
                 .set('content-type', 'application/x-www-form-urlencoded')
-                .set('grant_type', 'refresh')
+                .set('grant-type', 'refresh')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -227,14 +232,16 @@ describe('Oauth2', () => {
 
         it("invalid token", (done) => {
             sinon.stub(time, "getTimestampNow").returns(1623811920000);
-            
+
             chai.request(app())
                 .post('/api/authentication/oauth/validate')
                 .set('content-type', 'application/x-www-form-urlencoded')
                 .set('authorization', "Bearer "+oauth2StubValue["dataValues"]["access_token"])
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.text.should.be.equal("Invalid token")
+                    res.text.should.be.equal(
+                        JSON.stringify(BadRequestResult("Invalid token", "token"))
+                    )
                     done();
                 });
         });

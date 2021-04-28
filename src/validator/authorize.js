@@ -1,13 +1,13 @@
 const { header, body } = require('express-validator');
 
 exports.authorize = [
-    header("grant_type").equals("password"),
+    header("grant-type").equals("password"),
     body("username").isLength({min:1, max: 30}),
     body("password").isLength({min:1, max: 20})
 ];
 
 exports.refreshToken = [
-    header("grant_type").equals("refresh"),
+    header("grant-type").equals("refresh"),
     header("authorization").isLength({min:8})
 ];
 

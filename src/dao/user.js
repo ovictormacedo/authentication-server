@@ -3,21 +3,13 @@ const log = require('../util/log');
 const conf = require('./config');
 
 const userSchema = conf.sequelize.define('user', {
-    name: {
-        type: DataTypes.STRING
-    },
-    last_name: {
-        type: DataTypes.STRING
-    },
-    phone: {
-        type: DataTypes.STRING
-    },
-    email: {
-        type: DataTypes.STRING
-    },
-    password: {
-        type: DataTypes.STRING
-    },
+    name: {type: DataTypes.STRING},
+    last_name: {type: DataTypes.STRING},
+    phone: {type: DataTypes.STRING},
+    email: {type: DataTypes.STRING},
+    password: {type: DataTypes.STRING},
+    document: {type: DataTypes.STRING},
+    document_type: {type: DataTypes.STRING},
     created_at: { type: DataTypes.DATE },
     updated_at: { type: DataTypes.DATE },
     deleted_at: { type: DataTypes.DATE },
@@ -35,7 +27,10 @@ const roleSchema = conf.sequelize.define('role', {
     tableName: "role",
 });
 
-const userRoleSchema = conf.sequelize.define('user_role', {},
+const userRoleSchema = conf.sequelize.define('user_role', {
+    user_id: {type: DataTypes.INTEGER},
+    role_id: {type: DataTypes.INTEGER},
+},
 {timestamps: false, paranoid: false, tableName: "user_role"});
 
 userSchema.belongsToMany(roleSchema, { through: userRoleSchema });
@@ -92,9 +87,10 @@ exports.getUserByPhone = async (phone) => {
 exports.signUp = async (user, roleName) => {
     try {
         let role = await roleSchema.findOne({where: {name: roleName}});
-        let payload = user;
-        payload.roles = [role];
-        return await userSchema.create(payload, {include: roleSchema})
+        let userAux = await userSchema.create(user);
+        await userAux.setRoles(role.id);
+        userAux.dataValues.roles = [role.dataValues];
+        return userAux;
     } catch (error) {
         log.error(error);
         return null;
