@@ -90,7 +90,6 @@ exports.signUp = async (req, res) => {
 
         user = await userDao.signUp({
             name: req.body.name,
-            last_name: req.body.last_name,
             phone: req.body.phone,
             email: req.body.email,
             document: req.body.document,

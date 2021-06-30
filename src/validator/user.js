@@ -33,7 +33,6 @@ exports.getUserByPhone = [
 
 exports.signUp = [
     body("name").isLength({min:1, max: 50}),
-    body("last_name").isLength({min:1, max: 50}),
     body("phone").isLength({min:10, max: 15}),
     body("email").isEmail(),
     body("password").isLength({min:1, max: 10}),

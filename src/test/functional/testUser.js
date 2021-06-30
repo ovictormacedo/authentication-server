@@ -17,8 +17,7 @@ chai.use(chaiHttp);
 describe('User', () => {
     let userStubValue = {
         "id": "1",
-        "name": "Test",
-        "last_name": "Test",
+        "name": "Test Test",
         "phone": "+5532900000000",
         "email": "test@email.com",
         "password": "test",
@@ -84,7 +83,6 @@ describe('User', () => {
                     res.should.have.status(200);
                     res.body.should.have.property("id")
                     res.body.should.have.property("name")
-                    res.body.should.have.property("last_name")
                     res.body.should.have.property("email")
                     res.body.should.have.property("phone")
                     res.body.should.not.have.property("password")
@@ -123,7 +121,6 @@ describe('User', () => {
                     res.should.have.status(200);
                     res.body.should.have.property("id")
                     res.body.should.have.property("name")
-                    res.body.should.have.property("last_name")
                     res.body.should.have.property("email")
                     res.body.should.have.property("phone")
                     res.body.should.not.have.property("password")
@@ -162,7 +159,6 @@ describe('User', () => {
                     res.should.have.status(200);
                     res.body.should.have.property("id")
                     res.body.should.have.property("name")
-                    res.body.should.have.property("last_name")
                     res.body.should.have.property("email")
                     res.body.should.have.property("phone")
                     res.body.should.not.have.property("password")
@@ -222,7 +218,6 @@ describe('User', () => {
                     res.should.have.status(200);
                     res.body.should.have.property("id")
                     res.body.should.have.property("name")
-                    res.body.should.have.property("last_name")
                     res.body.should.have.property("email")
                     res.body.should.have.property("phone")
                     res.body.should.not.have.property("password")

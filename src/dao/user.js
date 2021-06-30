@@ -4,7 +4,6 @@ const conf = require('./config');
 
 const userSchema = conf.sequelize.define('user', {
     name: {type: DataTypes.STRING},
-    last_name: {type: DataTypes.STRING},
     phone: {type: DataTypes.STRING},
     email: {type: DataTypes.STRING},
     password: {type: DataTypes.STRING},

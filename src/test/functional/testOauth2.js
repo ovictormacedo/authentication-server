@@ -28,10 +28,9 @@ describe('Oauth2', () => {
 
     const userStubValue = {
         "id": "4",
-        "name": "Víctor",
-        "last_name": "Macêdo",
-        "phone": "+5532984747808",
-        "email": "ovictormacedo@gmail.com"
+        "name": "Test Test",
+        "phone": "+5532900000000",
+        "email": "email@email.com"
     }
 
     const oauth2StubValue = {
