@@ -1,11 +1,13 @@
 FROM node:15.11.0-alpine3.10
 
-WORKDIR /var/authentication
+WORKDIR /var/authentication/src
 
-COPY ./src /var/authentication
+COPY . /var/authentication
 
-RUN npm install
+RUN cp /var/authentication/.env-production /var/authentication/src/.env 
 
 EXPOSE 3001
+
+RUN npm install
 
 CMD [ "node", "app.js" ]

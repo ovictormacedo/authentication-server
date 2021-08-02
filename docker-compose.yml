@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     image: authentication_api
     container_name: authentication_api
-    restart: unless-stopped
-    env_file: .env
+    restart: always
+    env_file: .env-production
     environment:
       - APPLICATION_PORT=$APPLICATION_PORT
       - APP_LOG_PATH=$APP_LOG_PATH
