@@ -8,7 +8,7 @@ services:
     image: authentication_api
     container_name: authentication_api
     restart: always
-    env_file: .env-production
+    env_file: .env
     environment:
       - APPLICATION_PORT=$APPLICATION_PORT
       - APP_LOG_PATH=$APP_LOG_PATH
