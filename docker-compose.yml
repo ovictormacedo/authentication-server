@@ -22,6 +22,8 @@ services:
       - "${APPLICATION_PORT}:${APPLICATION_PORT}"
     networks:
       - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   app-network:
