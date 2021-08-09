@@ -41,6 +41,6 @@ exports.signUp = [
         body("role").equals("realtor"),
         body("role").equals("proprietary"),
     ]),
-    body("document").isLength({min:14, max: 15}),
+    body("document").isLength({min:11, max: 15}),
     body("document_type").isString(),
 ];
